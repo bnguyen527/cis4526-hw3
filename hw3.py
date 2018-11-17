@@ -1,32 +1,43 @@
 def hinge_loss(train_y, pred_y):
-	return None
-	
+    return None
+
+
 def squared_loss(train_y, pred_y):
-	return None
-	
+    return None
+
+
 def logistic_loss(train_y, pred_y):
-	return None
-	
+    return None
+
+
 def l1_reg(w):
-	return None
-	
+    return None
+
+
 def l2_reg(w):
-	return None	
+    return None
+
 
 def train_classifier(train_x, train_y, learn_rate, loss, lambda_val, regularizer):
-	return None
+    return None
+
 
 def test_classifier(w, test_x):
-	return None
+    return None
+
 
 def compute_accuracy(test_y, pred_y):
-	return None
+    return None
 
+
+# Return a string representing author's Temple AccessNet.
 def get_id():
-	return None
+    return 'tug21976'
+
 
 def main():
-	return None
+    return None
+
 
 if __name__ == "__main__":
     main()
