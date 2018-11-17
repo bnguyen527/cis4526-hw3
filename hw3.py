@@ -1,3 +1,5 @@
+import math
+
 import numpy as np
 
 
@@ -11,8 +13,9 @@ def squared_loss(train_y, pred_y):
     return (train_y-pred_y)**2
 
 
+# Calculate logistic loss given training and prediction label vectors.
 def logistic_loss(train_y, pred_y):
-    return None
+    return np.log(np.ones(train_y.size)+np.exp(-train_y*pred_y)) / math.log(2)
 
 
 def l1_reg(w):
