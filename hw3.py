@@ -30,13 +30,13 @@ def l2_reg(w):
 
 # Return vector of learned linear classifier weights given training data,
 # learning rate, loss function, lambda tradeoff parameter, and regularizer.
-def train_classifier(train_x, train_y, learn_rate, loss, lambda_val=0, regularizer=None):
+def train_classifier(train_x, train_y, learn_rate, loss, lambda_val, regularizer):
     train_x_padded = padding(train_x)
     weights = np.dot(pseudo_inverse(train_x_padded), train_y)
     gradient = np.ones(weights.size)
     while not np.allclose(gradient, np.zeros(weights.size), atol=1e-12):
-        gradient = num_gradient(calculate_loss, weights,
-                                loss, train_x, train_y)
+        gradient = num_gradient(calc_loss_with_reg, weights,
+                                loss, regularizer, train_x, train_y)
         weights = weights - learn_rate*gradient
     return weights
 
@@ -75,10 +75,16 @@ def calculate_loss(w, func, train_x, train_y):
     return func(train_y, test_classifier(w, train_x))
 
 
+# Calculate loss with regularization given vector or linear classifier weights,
+# loss function, regularizer, and training data.
+def calc_loss_with_reg(w, loss, regularizer, train_x, train_y):
+    return calculate_loss(w, loss, train_x, train_y) + regularizer(w)
+
+
 # Calculate the numerical gradient of func with arguments params.
 def num_gradient(func, params, *args):
     indices = np.arange(params.size).reshape((params.size, 1))
-    return np.apply_along_axis(lambda i: part_num_diff(func, params, i, args), 1, indices)
+    return np.apply_along_axis(lambda i: part_num_diff(func, params, i, *args), 1, indices)
 
 
 # Perform partial numerical differentiation on func on the index-th dimension
@@ -87,7 +93,7 @@ def part_num_diff(func, params, index, *args):
     h = 1e-5
     inc_params = np.copy(params)
     inc_params[index] += h
-    return (func(inc_params, args)-func(params, args)) / h
+    return (func(inc_params, *args)-func(params, *args)) / h
 
 
 def main():
