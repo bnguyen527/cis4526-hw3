@@ -23,8 +23,9 @@ def l1_reg(w):
     return np.absolute(w[:-1]).sum()
 
 
+# Calculate the value of L2 regularizer given vector of linear classifier weights.
 def l2_reg(w):
-    return None
+    return np.sum(w[:-1]**2)
 
 
 def train_classifier(train_x, train_y, learn_rate, loss, lambda_val, regularizer):
