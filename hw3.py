@@ -1,8 +1,9 @@
 import numpy as np
 
 
+# Calculate hinge loss given training and prediction label vectors.
 def hinge_loss(train_y, pred_y):
-    return None
+    return np.maximum(np.zeros(train_y.size), np.ones(train_y.size) - train_y*pred_y)
 
 
 def squared_loss(train_y, pred_y):
