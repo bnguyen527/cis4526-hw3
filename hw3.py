@@ -5,17 +5,17 @@ import numpy as np
 
 # Calculate hinge loss given training and prediction label vectors.
 def hinge_loss(train_y, pred_y):
-    return np.maximum(np.zeros(train_y.size), 1 - train_y*pred_y)
+    return np.maximum(np.zeros(train_y.size), 1 - train_y*pred_y).sum()
 
 
 # Calculate squared loss given training and prediction label vectors.
 def squared_loss(train_y, pred_y):
-    return (train_y-pred_y)**2
+    return np.sum((train_y-pred_y)**2)
 
 
 # Calculate logistic loss given training and prediction label vectors.
 def logistic_loss(train_y, pred_y):
-    return np.log(1+np.exp(-train_y*pred_y)) / math.log(2)
+    return np.log(1+np.exp(-train_y*pred_y).sum() / math.log(2))
 
 
 # Calculate the value of L1 regularizer given vector of linear classifer weights.
@@ -28,8 +28,17 @@ def l2_reg(w):
     return np.sum(w[:-1]**2)
 
 
-def train_classifier(train_x, train_y, learn_rate, loss, lambda_val, regularizer):
-    return None
+# Return vector of learned linear classifier weights given training data,
+# learning rate, loss function, lambda tradeoff parameter, and regularizer.
+def train_classifier(train_x, train_y, learn_rate, loss, lambda_val=0, regularizer=None):
+    train_x_padded = padding(train_x)
+    weights = np.dot(pseudo_inverse(train_x_padded), train_y)
+    gradient = np.ones(weights.size)
+    while not np.allclose(gradient, np.zeros(weights.size), atol=1e-12):
+        gradient = num_gradient(calculate_loss, weights,
+                                loss, train_x, train_y)
+        weights = weights - learn_rate*gradient
+    return weights
 
 
 # Return prediction label vectors given vector of learned classifier weights
@@ -53,6 +62,32 @@ def get_id():
 # end of X.
 def padding(X):
     return np.append(X, np.ones((X.shape[0], 1)), 1)
+
+
+# Calculate the pseudo-inverse of a matrix.
+def pseudo_inverse(matrix):
+    return np.dot(np.linalg.inv(np.dot(matrix.T, matrix)), matrix.T)
+
+
+# Calculate loss given vector of linear classifier weights, loss function, and
+# training data.
+def calculate_loss(w, func, train_x, train_y):
+    return func(train_y, test_classifier(w, train_x))
+
+
+# Calculate the numerical gradient of func with arguments params.
+def num_gradient(func, params, *args):
+    indices = np.arange(params.size).reshape((params.size, 1))
+    return np.apply_along_axis(lambda i: part_num_diff(func, params, i, args), 1, indices)
+
+
+# Perform partial numerical differentiation on func on the index-th dimension
+# with arguments params.
+def part_num_diff(func, params, index, *args):
+    h = 1e-5
+    inc_params = np.copy(params)
+    inc_params[index] += h
+    return (func(inc_params, args)-func(params, args)) / h
 
 
 def main():
