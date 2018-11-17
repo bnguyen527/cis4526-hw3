@@ -32,8 +32,11 @@ def train_classifier(train_x, train_y, learn_rate, loss, lambda_val, regularizer
     return None
 
 
+# Return prediction label vectors given vector of learned classifier weights
+# and test examples.
 def test_classifier(w, test_x):
-    return None
+    activation = np.dot(padding(test_x), w).reshape((test_x.shape[0], 1))
+    return np.apply_along_axis(lambda y: 1 if y > 0 else -1, 1, activation)
 
 
 # Return a float between 0.0 and 1.0 representing the classification accuracy.
@@ -44,6 +47,12 @@ def compute_accuracy(test_y, pred_y):
 # Return a string representing author's Temple AccessNet.
 def get_id():
     return 'tug21976'
+
+
+# Provide paddings of aritifical coordinates of value 1 as a new column at the
+# end of X.
+def padding(X):
+    return np.append(X, np.ones((X.shape[0], 1)), 1)
 
 
 def main():
