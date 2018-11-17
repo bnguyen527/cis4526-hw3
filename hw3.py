@@ -6,8 +6,9 @@ def hinge_loss(train_y, pred_y):
     return np.maximum(np.zeros(train_y.size), np.ones(train_y.size) - train_y*pred_y)
 
 
+# Calculate squared loss given training and prediction label vectors.
 def squared_loss(train_y, pred_y):
-    return None
+    return (train_y-pred_y)**2
 
 
 def logistic_loss(train_y, pred_y):
