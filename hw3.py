@@ -5,7 +5,7 @@ import numpy as np
 
 # Calculate hinge loss given training and prediction label vectors.
 def hinge_loss(train_y, pred_y):
-    return np.maximum(np.zeros(train_y.size), np.ones(train_y.size) - train_y*pred_y)
+    return np.maximum(np.zeros(train_y.size), 1 - train_y*pred_y)
 
 
 # Calculate squared loss given training and prediction label vectors.
@@ -15,11 +15,12 @@ def squared_loss(train_y, pred_y):
 
 # Calculate logistic loss given training and prediction label vectors.
 def logistic_loss(train_y, pred_y):
-    return np.log(np.ones(train_y.size)+np.exp(-train_y*pred_y)) / math.log(2)
+    return np.log(1+np.exp(-train_y*pred_y)) / math.log(2)
 
 
+# Calculate the value of L1 regularizer given vector of linear classifer weights.
 def l1_reg(w):
-    return None
+    return np.absolute(w[:-1]).sum()
 
 
 def l2_reg(w):
