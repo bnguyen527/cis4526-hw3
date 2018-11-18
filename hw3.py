@@ -30,7 +30,7 @@ def l2_reg(w):
 
 # Return vector of learned linear classifier weights given training data,
 # learning rate, loss function, lambda tradeoff parameter, and regularizer.
-def train_classifier(train_x, train_y, learn_rate, loss, lambda_val, regularizer):
+def train_classifier(train_x, train_y, learn_rate, loss, lambda_val=1.0, regularizer=None):
     train_x_padded = padding(train_x)
     weights = 0.2 * np.random.randn(train_x_padded.shape[1])
     gradient = num_gradient(calc_loss_with_reg, weights, loss, lambda_val, regularizer, train_x, train_y)
@@ -57,6 +57,25 @@ def get_id():
     return 'tug21976'
 
 
+# Detect and remove outliers that are more than k standard deviation from the
+# mean of that dimension. Default for k is 6.
+def detect_outliers(train_x, k=6):
+    for i in range(train_x.shape[1]):
+        col = train_x[:, i]
+        train_x = train_x[np.absolute(col-np.mean(col)) <= k*np.std(col)]
+    return train_x
+
+
+# Calculate mean and standard deviation of each column of train_x for testing.
+def calc_mean_and_std(train_x):
+    return np.apply_along_axis(np.mean, 1, train_x), np.apply_along_axis(np.std, 1, train_x)
+
+
+# Normalize training examples by centering and variance scaling.
+def center_and_var_scale(X, mean, std):
+    return np.apply_along_axis(lambda i: (X[:, i]-mean[i]) / std[i], 0, np.arange(X.shape[1]))
+
+
 # Provide paddings of aritifical coordinates of value 1 as a new column at the
 # end of X.
 def padding(X):
@@ -78,13 +97,16 @@ def calculate_loss(w, func, train_x, train_y):
 # Calculate loss with regularization given vector or linear classifier weights,
 # loss function, regularizer, and training data.
 def calc_loss_with_reg(w, loss, lambda_val, regularizer, train_x, train_y):
-    return calculate_loss(w, loss, train_x, train_y) + lambda_val*regularizer(w)
+    loss = calculate_loss(w, loss, train_x, train_y)
+    if regularizer is not None:
+        loss += lambda_val*regularizer(w)
+    return loss
 
 
 # Calculate the numerical gradient of func with arguments params.
 def num_gradient(func, params, *args):
     indices = np.arange(params.size).reshape((params.size, 1))
-    return np.apply_along_axis(lambda i: part_num_diff(func, params, i, *args), 1, indices)
+    return np.apply_along_axis(lambda i: part_num_diff(func, params, i, *args), 1, indices).flatten()
 
 
 # Perform partial numerical differentiation on func on the index-th dimension
